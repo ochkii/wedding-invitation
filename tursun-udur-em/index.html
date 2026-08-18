@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Төрсөн өдрийн урилга — Ануужин</title>
+    <meta name="description" content="Хүүхдийн төрсөн өдрийн найрын урилга — Бяцхан гүнж">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            /* ӨНГӨ СОЛИХ: охин хүүхдийн ягаан өнгөний схем */
+            --main:       #cf6f92;
+            --main-deep:  #8d4360;
+            --soft:       #f3c6d5;
+            --lilac:      #b18ad0;
+            --gold:       #c9a34e;
+            --gold-light: #e6cf9a;
+            --cream:      #fef8fa;
+            --cream-2:    #f8e5ec;
+            --dark:       #4a2b39;
+            --text:       #7c6570;
+            --script: 'Caveat', cursive;
+            --head:   'Comfortaa', 'Nunito', sans-serif;
+            --body:   'Nunito', 'Comfortaa', sans-serif;
+        }
+
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: var(--body);
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.75;
+            user-select: none;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ── Слайдын систем ───────────────────────────── */
+        .slides { position: relative; width: 100vw; height: 100vh; }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 56px 24px 72px;
+            /* улзий хээт усан цаас */
+            background:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23cf6f92' stroke-opacity='.13' stroke-width='2'%3E%3Cg transform='translate(48 48) rotate(45) translate(-20 -20)'%3E%3Cpath d='M16 8C16 1 24 1 24 8V32C24 39 16 39 16 32Z'/%3E%3Cpath d='M8 16C1 16 1 24 8 24H32C39 24 39 16 32 16Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center/96px repeat,
+                var(--cream);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.7s ease, visibility 0.7s;
+            overflow-y: auto;
+        }
+        .slide.active { opacity: 1; visibility: visible; z-index: 2; }
+        .slide.active > * { animation: rise 0.8s ease both; }
+        .slide.active > *:nth-child(2) { animation-delay: .08s; }
+        .slide.active > *:nth-child(3) { animation-delay: .16s; }
+        .slide.active > *:nth-child(4) { animation-delay: .24s; }
+        .slide.active > *:nth-child(5) { animation-delay: .32s; }
+        .slide.active > *:nth-child(6) { animation-delay: .40s; }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Алхан хээт хүрээ ─────────────────────────── */
+        .frame-band {
+            position: fixed; left: 0; right: 0;
+            height: 17px; z-index: 40;
+            pointer-events: none; opacity: .85; display: block;
+        }
+        .frame-band.top    { top: 0; }
+        .frame-band.bottom { bottom: 0; transform: scaleY(-1); }
+
+        /* ── Явцын мөр ба удирдлага ───────────────────── */
+        .progress {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: 3px; background: rgba(0,0,0,0.08); z-index: 100;
+        }
+        .progress-bar {
+            height: 100%; width: 0;
+            background: linear-gradient(90deg, var(--main), var(--gold));
+            transition: width 0.5s ease;
+        }
+
+        .hint {
+            position: fixed; bottom: 34px; left: 50%;
+            transform: translateX(-50%);
+            max-width: 92vw; white-space: nowrap;
+            color: #fff; font-size: 12px; letter-spacing: 2px;
+            z-index: 50; opacity: .9; pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 1px 6px rgba(0,0,0,.55);
+        }
+        .hint.dark { color: var(--text); text-shadow: none; }
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) translateY(0);    opacity: .85; }
+            50%      { transform: translateX(-50%) translateY(-6px); opacity: 1; }
+        }
+
+        .nav-btn {
+            position: fixed; top: 50%; transform: translateY(-50%);
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,.8);
+            border: 1px solid var(--soft);
+            color: var(--main-deep); font-size: 20px; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 60; transition: all .3s;
+            backdrop-filter: blur(4px);
+        }
+        .nav-btn:hover { background: var(--main); color: #fff; }
+        .nav-btn.prev { left: 18px; }
+        .nav-btn.next { right: 18px; }
+        .nav-btn:disabled { opacity: .25; cursor: not-allowed; }
+
+        .slide-num {
+            position: fixed; top: 26px; right: 22px;
+            font-family: var(--head); font-size: 13px;
+            letter-spacing: 2px; color: rgba(255,255,255,.92);
+            z-index: 50; text-shadow: 0 1px 6px rgba(0,0,0,.55);
+        }
+        .slide-num.dark { color: var(--text); text-shadow: none; }
+
+        /* ── Хээ угалзын элементүүд ───────────────────── */
+        .khee-ico { width: 30px; height: 30px; color: var(--gold); flex: none; }
+        .khee-ico.wide { width: 74px; height: 38px; }
+        .khee-strip { display: block; width: 100%; height: 13px; opacity: .8; }
+        .corner-khee {
+            position: absolute; width: 54px; height: 54px;
+            color: rgba(255,255,255,.75); pointer-events: none;
+        }
+        .corner-khee.tl { top: 0;  left: 0; }
+        .corner-khee.tr { top: 0;  right: 0; transform: rotate(90deg); }
+        .corner-khee.br { bottom: 0; right: 0; transform: rotate(180deg); }
+        .corner-khee.bl { bottom: 0; left: 0;  transform: rotate(270deg); }
+
+        /* ── Нийтлэг блокууд ──────────────────────────── */
+        .section-label {
+            font-family: var(--script);
+            font-size: 34px; line-height: 1.2;
+            color: var(--main); margin-bottom: 2px;
+        }
+        .section-title {
+            font-family: var(--head);
+            font-size: clamp(21px, 5vw, 27px);
+            font-weight: 600; letter-spacing: 2px;
+            color: var(--dark); margin-bottom: 6px;
+        }
+        .ornament {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; margin: 10px 0 20px; color: var(--gold);
+        }
+        .ornament .line { width: 54px; height: 1px; background: currentColor; opacity: .7; }
+        .light .section-label { color: var(--gold-light); }
+        .light .section-title { color: #fff; }
+        .light .ornament .khee-ico { color: var(--gold-light); }
+        .light .ornament .line { background: rgba(255,255,255,.8); }
+
+        .lead { max-width: 545px; font-size: 16.5px; color: var(--text); }
+        .lead strong { color: var(--main-deep); }
+        .note { margin-top: 22px; font-size: 13px; color: var(--main); letter-spacing: 1px; }
+
+        /* ── 1 · Нүүр ─────────────────────────────────── */
+        #slide-1 {
+            /* ЗУРАГ СОЛИХ: хүүхдийн бүтэн биеийн зураг */
+            background:
+                linear-gradient(180deg, rgba(74,29,49,.32) 0%, rgba(74,29,49,.76) 100%),
+                url('https://picsum.photos/seed/mn-girl-cover/1600/1200') center/cover;
+            color: #fff;
+            overflow: hidden;
+        }
+        #slide-1 .frame {
+            position: absolute; inset: 26px;
+            border: 1px solid rgba(255,255,255,.45);
+            pointer-events: none;
+        }
+        #slide-1 .frame::after {
+            content: ''; position: absolute; inset: 6px;
+            border: 1px solid rgba(255,255,255,.22);
+        }
+        #slide-1 .crown { width: 62px; height: 42px; color: var(--gold-light); margin-bottom: 6px; }
+        #slide-1 .kicker {
+            font-family: var(--script); font-size: 32px;
+            color: var(--gold-light); margin-bottom: 2px;
+        }
+        #slide-1 .type {
+            font-family: var(--head); font-size: 12.5px;
+            letter-spacing: 6px; text-transform: uppercase; opacity: .92;
+        }
+        #slide-1 .child-name {
+            font-family: var(--head); font-weight: 600;
+            font-size: clamp(28px, 7.6vw, 76px);
+            max-width: 100%;
+            overflow-wrap: break-word;
+            letter-spacing: 3px; line-height: 1.1;
+            margin: 14px 0 4px;
+            text-shadow: 0 2px 18px rgba(0,0,0,.35);
+        }
+        #slide-1 .age-badge {
+            display: inline-flex; flex-direction: column; align-items: center;
+            justify-content: center;
+            width: 92px; height: 92px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.6);
+            background: rgba(255,255,255,.13);
+            backdrop-filter: blur(3px);
+            margin: 14px 0 16px;
+        }
+        #slide-1 .age-badge .n {
+            font-family: var(--head); font-size: 40px; font-weight: 600;
+            line-height: 1; color: var(--gold-light);
+        }
+        #slide-1 .age-badge .u { font-size: 11px; letter-spacing: 3px; opacity: .9; }
+        #slide-1 .date-line { font-size: 14px; letter-spacing: 5px; }
+
+        /* Цаас цацалт */
+        .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .confetti i {
+            position: absolute; top: -12%;
+            width: 8px; height: 8px; border-radius: 2px;
+            opacity: .75; animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0%   { transform: translateY(0) rotate(0deg);       opacity: 0; }
+            10%  { opacity: .8; }
+            100% { transform: translateY(115vh) rotate(540deg); opacity: 0; }
+        }
+
+        /* Хөөрөх бөмбөлөг */
+        .balloons { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .balloons i {
+            position: absolute; bottom: -160px;
+            width: 34px; height: 43px;
+            border-radius: 50% 50% 47% 47%;
+            opacity: .8; animation: floatUp linear infinite;
+        }
+        .balloons i::after {
+            content: ''; position: absolute; top: 100%; left: 50%;
+            width: 1px; height: 34px; background: rgba(255,255,255,.5);
+        }
+        @keyframes floatUp {
+            0%   { transform: translateY(0) rotate(-5deg);      opacity: 0; }
+            12%  { opacity: .8; }
+            100% { transform: translateY(-122vh) rotate(5deg);  opacity: 0; }
+        }
+
+        /* ── 2 · Мэндчилгээ ───────────────────────────── */
+        .family {
+            display: flex; justify-content: center; gap: 44px;
+            flex-wrap: wrap; margin-top: 26px;
+        }
+        .family .col { min-width: 170px; font-size: 15.5px; color: var(--dark); }
+        .family .role {
+            font-family: var(--head); font-size: 11px; letter-spacing: 3px;
+            color: var(--main); text-transform: uppercase; margin-bottom: 6px;
+        }
+
+        /* ── 3 · Хүүхдийн тухай ───────────────────────── */
+        .child-card { max-width: 470px; }
+        .photo-ring { position: relative; display: inline-block; padding: 12px; }
+        .photo-ring::before {
+            content: ''; position: absolute; inset: 0;
+            border: 1px solid var(--soft); border-radius: 50%;
+        }
+        .photo-ring .ring-khee {
+            position: absolute; width: 40px; height: 22px; color: var(--gold);
+            left: 50%; margin-left: -20px;
+        }
+        .photo-ring .ring-khee.up   { top: -16px; }
+        .photo-ring .ring-khee.down { bottom: -16px; transform: rotate(180deg); }
+        .child-photo {
+            width: 180px; height: 180px; border-radius: 50%;
+            object-fit: cover; background: #fff; padding: 6px;
+            border: 2px solid var(--main); display: block;
+            box-shadow: 0 14px 34px rgba(74,43,57,.16);
+        }
+        .child-card h3 {
+            font-family: var(--head); font-size: 27px; font-weight: 600;
+            letter-spacing: 2px; color: var(--dark); margin-top: 22px;
+        }
+        .child-card .sub {
+            font-size: 12px; letter-spacing: 3px; color: var(--main);
+            text-transform: uppercase; margin-top: 2px;
+        }
+        .facts {
+            display: flex; justify-content: center; gap: 10px;
+            flex-wrap: wrap; margin-top: 18px;
+        }
+        .facts span {
+            background: rgba(255,255,255,.85); border: 1px solid var(--cream-2);
+            border-radius: 999px; padding: 7px 16px; font-size: 13.5px;
+        }
+        .child-card .quote { margin-top: 18px; font-style: italic; font-size: 15px; }
+
+        /* ── 4 · Өссөн зам ────────────────────────────── */
+        .growth {
+            display: flex; justify-content: center; gap: 18px;
+            flex-wrap: wrap; max-width: 760px; margin-top: 6px;
+        }
+        .growth figure { width: 128px; }
+        .growth img {
+            width: 114px; height: 114px; border-radius: 50%;
+            object-fit: cover; display: block; margin: 0 auto;
+            border: 2px solid #fff;
+            box-shadow: 0 8px 20px rgba(74,43,57,.14);
+        }
+        .growth figcaption { margin-top: 10px; }
+        .growth .y {
+            font-family: var(--head); font-size: 14px; font-weight: 600;
+            color: var(--main); display: block;
+        }
+        .growth .c { font-size: 12.5px; line-height: 1.5; display: block; }
+
+        /* ── 5 · Зургийн цомог ────────────────────────── */
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; max-width: 660px; width: 100%;
+        }
+        .gallery-grid img {
+            width: 100%; height: 150px; object-fit: cover;
+            border-radius: 10px; display: block;
+            border: 1px solid var(--soft);
+            transition: transform .4s ease;
+        }
+        .gallery-grid img:hover { transform: scale(1.03); }
+        .gallery-grid .tall { grid-row: span 2; height: 310px; }
+
+        /* ── 6 · Огноо ба цаг ─────────────────────────── */
+        .details-grid {
+            display: flex; justify-content: center; gap: 20px;
+            flex-wrap: wrap; max-width: 620px;
+        }
+        .detail-card {
+            min-width: 215px; overflow: hidden;
+            background: #fff; border: 1px solid var(--cream-2);
+            border-radius: 16px; padding-bottom: 20px;
+            box-shadow: 0 10px 26px rgba(74,43,57,.07);
+        }
+        .detail-card .body { padding: 16px 30px 0; }
+        .detail-card .icon { font-size: 26px; margin-bottom: 6px; }
+        .detail-card h4 {
+            font-family: var(--head); font-size: 13px; font-weight: 600;
+            letter-spacing: 3px; color: var(--dark);
+            text-transform: uppercase; margin-bottom: 8px;
+        }
+        .detail-card .big {
+            font-family: var(--head); font-size: 36px; font-weight: 600;
+            color: var(--main); line-height: 1.1;
+        }
+        .detail-card p { font-size: 14.5px; margin: 2px 0; }
+
+        /* ── 7 · Байршил ──────────────────────────────── */
+        .venue {
+            font-family: var(--head); font-size: 21px; font-weight: 600;
+            letter-spacing: 2px; color: var(--dark);
+        }
+        .venue-sub  { margin-top: 6px; font-size: 15px; }
+        .venue-addr { margin-top: 4px; font-size: 13px; color: var(--main); }
+        .map-frame {
+            max-width: 520px; width: 100%; margin: 22px auto 0;
+            border: 1px solid var(--soft); border-radius: 14px;
+            padding: 6px; background: #fff;
+        }
+        .map-frame img { width: 100%; display: block; border-radius: 9px; }
+        .map-btn {
+            display: inline-block; margin-top: 16px; padding: 11px 26px;
+            border-radius: 999px; background: var(--main); color: #fff;
+            font-family: var(--head); font-size: 12px; letter-spacing: 2px;
+            text-decoration: none;
+        }
+        .map-btn:hover { background: var(--dark); }
+
+        /* ── 8 · Хөтөлбөр ─────────────────────────────── */
+        .timeline { max-width: 430px; width: 100%; text-align: left; margin-top: 6px; }
+        .timeline li {
+            list-style: none; position: relative;
+            padding: 0 0 16px 34px;
+            border-left: 1px dashed var(--soft);
+        }
+        .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+        .timeline li::before {
+            content: ''; position: absolute; left: -5px; top: 9px;
+            width: 9px; height: 9px; transform: rotate(45deg);
+            background: var(--gold); box-shadow: 0 0 0 4px var(--cream);
+        }
+        .timeline .t {
+            font-family: var(--head); font-size: 13px; font-weight: 600;
+            color: var(--main); letter-spacing: 1px;
+        }
+        .timeline .d { font-size: 15px; color: var(--dark); }
+        .timeline .s { font-size: 13px; color: var(--text); }
+
+        /* ── 9 · Найрын онцлох ────────────────────────── */
+        .fun-grid {
+            display: flex; justify-content: center; gap: 14px;
+            flex-wrap: wrap; max-width: 740px; margin-top: 4px;
+        }
+        .fun-card {
+            flex: 1 1 168px; max-width: 200px;
+            background: #fff; border: 1px solid var(--cream-2);
+            border-radius: 16px; padding: 20px 18px;
+            box-shadow: 0 8px 20px rgba(74,43,57,.06);
+        }
+        .fun-card .ico { font-size: 28px; }
+        .fun-card h4 {
+            font-family: var(--head); font-size: 14.5px; font-weight: 600;
+            color: var(--dark); margin: 6px 0 4px;
+        }
+        .fun-card p { font-size: 13px; line-height: 1.6; }
+
+        /* ── 10 · Тоолол ──────────────────────────────── */
+        #slide-10 {
+            /* ЗУРАГ СОЛИХ: гэр бүлийн зураг */
+            background:
+                linear-gradient(rgba(141,67,96,.85), rgba(141,67,96,.85)),
+                url('https://picsum.photos/seed/mn-girl-count/1600/1200') center/cover;
+            color: #fff;
+        }
+        .countdown-grid { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .count-box {
+            width: 92px; padding: 16px 8px;
+            border: 1px solid rgba(255,255,255,.4); border-radius: 14px;
+            background: rgba(255,255,255,.08);
+        }
+        .count-box .num {
+            font-family: var(--head); font-size: 34px; font-weight: 600;
+            display: block; line-height: 1.2;
+        }
+        .count-box .label { font-size: 11px; letter-spacing: 2px; opacity: .85; }
+
+        /* ── 11 · Ирэх эсэх ───────────────────────────── */
+        #slide-11 form { max-width: 420px; width: 100%; margin-top: 12px; }
+        #slide-11 input, #slide-11 select, #slide-11 textarea {
+            width: 100%; padding: 11px 15px; margin-bottom: 9px;
+            border: 1px solid #f0d6e0; border-radius: 10px;
+            background: #fff; font-family: inherit; font-size: 15px; color: var(--text);
+        }
+        #slide-11 input:focus, #slide-11 select:focus, #slide-11 textarea:focus {
+            outline: none; border-color: var(--main);
+        }
+        #slide-11 button {
+            width: 100%; padding: 14px; border: none; border-radius: 999px;
+            background: var(--main); color: #fff;
+            font-family: var(--head); font-size: 13px; font-weight: 600;
+            letter-spacing: 3px; cursor: pointer; transition: background .3s;
+        }
+        #slide-11 button:hover { background: var(--dark); }
+        .contact { margin-top: 18px; font-size: 14px; }
+        .contact a { color: var(--main); text-decoration: none; }
+
+        /* ── 12 · Талархал ────────────────────────────── */
+        #slide-12 {
+            /* ЗУРАГ СОЛИХ: төгсгөлийн зураг */
+            background:
+                linear-gradient(rgba(74,43,57,.76), rgba(74,43,57,.76)),
+                url('https://picsum.photos/seed/mn-girl-thanks/1600/1200') center/cover;
+            color: #fff;
+        }
+        #slide-12 .crown { width: 58px; height: 40px; color: var(--gold-light); margin-bottom: 6px; }
+        #slide-12 .thanks {
+            font-family: var(--script); font-size: clamp(54px, 13vw, 80px);
+            color: var(--gold-light); line-height: 1.1;
+        }
+        #slide-12 .who {
+            font-family: var(--head); font-size: 17px; font-weight: 500;
+            letter-spacing: 3px; margin-top: 6px;
+        }
+        #slide-12 .final-date { margin-top: 12px; font-size: 13px; letter-spacing: 4px; opacity: .85; }
+
+        @media (max-width: 600px) {
+            .slide { padding: 50px 18px 72px; }
+            .child-photo { width: 156px; height: 156px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .gallery-grid img { height: 136px; }
+            .gallery-grid .tall { height: 280px; }
+            .growth { gap: 12px; }
+            .growth figure { width: 100px; }
+            .growth img { width: 88px; height: 88px; }
+            .nav-btn { width: 36px; height: 36px; font-size: 16px; }
+            .nav-btn.prev { left: 7px; }
+            .nav-btn.next { right: 7px; }
+            .family { gap: 26px; }
+            .count-box { width: 74px; padding: 13px 6px; }
+            .count-box .num { font-size: 27px; }
+            .corner-khee { width: 40px; height: 40px; }
+        }
+        /* Намхан дэлгэцэд зориулсан нягт горим */
+        @media (max-height: 880px) {
+            .slide { padding: 48px 20px 64px; }
+            .section-label { font-size: 28px; }
+            .ornament { margin: 8px 0 14px; }
+            .lead { font-size: 15.5px; }
+            .child-photo { width: 150px; height: 150px; }
+            .facts span { padding: 5px 13px; font-size: 12.5px; }
+            .child-card h3 { margin-top: 16px; }
+            .growth figure { width: 104px; }
+            .growth img { width: 88px; height: 88px; }
+            .gallery-grid img { height: 122px; }
+            .gallery-grid .tall { height: 254px; }
+            .detail-card .big { font-size: 32px; }
+            .timeline li { padding-bottom: 12px; }
+            .fun-card { padding: 14px 16px; }
+            .family { margin-top: 16px; }
+            #slide-11 input, #slide-11 select, #slide-11 textarea { padding: 9px 13px; margin-bottom: 7px; }
+        }
+        /* Маш намхан дэлгэц (жижиг утас) */
+        @media (max-height: 780px) {
+            .slide { padding: 42px 18px 58px; }
+            .section-label { font-size: 24px; }
+            .section-title { font-size: 19px; }
+            .ornament { margin: 6px 0 10px; }
+            .lead { font-size: 14.5px; line-height: 1.62; }
+            .child-photo { width: 128px; height: 128px; }
+            .facts span { padding: 4px 11px; font-size: 12px; }
+            .child-card .quote { margin-top: 12px; font-size: 14px; }
+            .gallery-grid img { height: 104px; }
+            .gallery-grid .tall { height: 216px; }
+            .detail-card { padding-bottom: 14px; }
+            .detail-card .body { padding: 12px 24px 0; }
+            .detail-card .big { font-size: 28px; }
+            .timeline li { padding-bottom: 9px; }
+            .timeline .d { font-size: 14px; }
+            .fun-card { padding: 11px 14px; }
+            .fun-card .ico { font-size: 22px; }
+            .note { margin-top: 12px; }
+            #slide-11 input, #slide-11 select, #slide-11 textarea { padding: 8px 12px; margin-bottom: 6px; }
+            #slide-11 button { padding: 11px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .slide.active > *, .confetti i, .balloons i, .hint { animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ Хээ угалз ба дүрсийн сан ═════════════════════ -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <!-- Алхан хээ (давтагдах) -->
+            <pattern id="alkhan" width="40" height="22" patternUnits="userSpaceOnUse">
+                <g fill="none" stroke="#cf6f92" stroke-width="2">
+                    <path d="M0 19H40"/>
+                    <path d="M5 19V5H35V15H13V11H27"/>
+                </g>
+            </pattern>
+            <pattern id="alkhanSm" width="40" height="22" patternUnits="userSpaceOnUse" patternTransform="scale(.55)">
+                <g fill="none" stroke="#c9a34e" stroke-width="2.4">
+                    <path d="M0 19H40"/>
+                    <path d="M5 19V5H35V15H13V11H27"/>
+                </g>
+            </pattern>
+
+            <!-- Улзий хээ -->
+            <symbol id="ulzii" viewBox="0 0 40 40">
+                <g fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M16 8C16 1 24 1 24 8V32C24 39 16 39 16 32Z"/>
+                    <path d="M8 16C1 16 1 24 8 24H32C39 24 39 16 32 16Z"/>
+                </g>
+            </symbol>
+
+            <!-- Эвэр угалз -->
+            <symbol id="ever" viewBox="0 0 80 40">
+                <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                    <path d="M40 34C40 22 30 24 26 17C22 10 28 4 34 7C39 9.5 40 14 40 20"/>
+                    <path d="M40 34C40 22 50 24 54 17C58 10 52 4 46 7C41 9.5 40 14 40 20"/>
+                    <path d="M8 30C8 22 14 20 18 22"/>
+                    <path d="M72 30C72 22 66 20 62 22"/>
+                </g>
+            </symbol>
+
+            <!-- Хатан суман хээ -->
+            <symbol id="sum" viewBox="0 0 60 24">
+                <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round">
+                    <path d="M2 18L14 6L26 18L38 6L50 18"/>
+                </g>
+            </symbol>
+
+            <!-- Булангийн хээ -->
+            <symbol id="cornerKhee" viewBox="0 0 60 60">
+                <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 58V12C4 7.6 7.6 4 12 4H58"/>
+                    <path d="M15 58V20C15 17.8 16.8 16 19 16H58"/>
+                    <path d="M26 28C33 28 38 33 38 40C38 45 34 48 30.5 46.5C27 45 27.5 40 31 39"/>
+                </g>
+            </symbol>
+
+            <!-- Титэм -->
+            <symbol id="crown" viewBox="0 0 48 32">
+                <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+                    <path d="M6 26L4 7l10 7 10-11 10 11 10-7-2 19z"/>
+                    <path d="M6 26h36"/>
+                    <circle cx="24" cy="14" r="1.6"/>
+                </g>
+            </symbol>
+
+            <!-- Эрвээхэй -->
+            <symbol id="erwee" viewBox="0 0 48 40">
+                <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M24 10v22"/>
+                    <path d="M24 13C20 5 9 3 6.5 10.5 4 18 12 20 14 24c-6 2-8 8-1.5 9.5C19 35 24 29 24 23"/>
+                    <path d="M24 13c4-8 15-10 17.5-2.5C44 18 36 20 34 24c6 2 8 8 1.5 9.5C29 35 24 29 24 23"/>
+                    <path d="M24 10c0-2.6 1.8-4 4-5.2M24 10c0-2.6-1.8-4-4-5.2"/>
+                </g>
+            </symbol>
+
+            <!-- Цэцэг -->
+            <symbol id="tsetseg" viewBox="0 0 40 40">
+                <g fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
+                    <circle cx="20" cy="20" r="4"/>
+                    <path d="M20 16c0-5-6-8-8-4s3 8 8 4Z"/>
+                    <path d="M20 16c0-5 6-8 8-4s-3 8-8 4Z"/>
+                    <path d="M20 24c0 5-6 8-8 4s3-8 8-4Z"/>
+                    <path d="M20 24c0 5 6 8 8 4s-3-8-8-4Z"/>
+                </g>
+            </symbol>
+
+            <!-- Төрсөн өдрийн бялуу -->
+            <symbol id="cake" viewBox="0 0 48 48">
+                <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M24 4c2.6 3 2.6 5.4 0 7-2.6-1.6-2.6-4 0-7Z"/>
+                    <path d="M24 12v6"/>
+                    <path d="M11 26c0-2.2 1.8-4 4-4h18c2.2 0 4 1.8 4 4v3H11z"/>
+                    <path d="M8 30h32v12H8z"/>
+                    <path d="M8 35c2.7 0 2.7-2.6 5.3-2.6S16 35 18.7 35s2.6-2.6 5.3-2.6S26.7 35 29.3 35s2.7-2.6 5.4-2.6S37.3 35 40 35"/>
+                </g>
+            </symbol>
+
+            <!-- Бөмбөлөг -->
+            <symbol id="balloon" viewBox="0 0 24 34">
+                <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                    <ellipse cx="12" cy="11" rx="7.5" ry="9.5"/>
+                    <path d="M10.5 21.5h3l-1.5 2.5z"/>
+                    <path d="M12 24.5c0 3-3 3-3 5.5s3 2.5 3 2.5"/>
+                </g>
+            </symbol>
+        </defs>
+    </svg>
+
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+    <!-- Алхан хээт хүрээ -->
+    <svg class="frame-band top" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#alkhan)"/></svg>
+    <svg class="frame-band bottom" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#alkhan)"/></svg>
+
+    <div class="slide-num" id="slideNum">01 / 12</div>
+
+    <button class="nav-btn prev" id="prevBtn" aria-label="Өмнөх">‹</button>
+    <button class="nav-btn next" id="nextBtn" aria-label="Дараах">›</button>
+
+    <div class="slides" id="slides">
+
+        <!-- 1 · Нүүр -->
+        <section class="slide active light" id="slide-1" data-hint-dark="false">
+            <span class="frame">
+                <svg class="corner-khee tl" aria-hidden="true"><use href="#cornerKhee"/></svg>
+                <svg class="corner-khee tr" aria-hidden="true"><use href="#cornerKhee"/></svg>
+                <svg class="corner-khee br" aria-hidden="true"><use href="#cornerKhee"/></svg>
+                <svg class="corner-khee bl" aria-hidden="true"><use href="#cornerKhee"/></svg>
+            </span>
+            <span class="confetti" id="confetti"></span>
+            <span class="balloons" id="balloons"></span>
+            <svg class="crown" aria-hidden="true"><use href="#crown"/></svg>
+            <div class="kicker">Урьж байна</div>
+            <div class="type">Төрсөн өдрийн найр</div>
+            <h1 class="child-name">АНУУЖИН</h1>
+            <div class="age-badge"><span class="n">4</span><span class="u">НАС</span></div>
+            <div class="date-line">2026 · 10 · 24</div>
+        </section>
+
+        <!-- 2 · Мэндчилгээ -->
+        <section class="slide" id="slide-2" data-hint-dark="true">
+            <div class="section-label">Эрхэм хүндэт та бүхэнд</div>
+            <h2 class="section-title">Төрсөн өдрийн урилга</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#ulzii"/></svg>
+                <span class="line"></span>
+            </div>
+            <p class="lead">
+                Бидний хайрт охин <strong>Ануужин</strong> маань
+                дөрвөн насны төрсөн өдрөө тэмдэглэхээр боллоо.
+                Бяцхан гүнжийнхээ энэ цэцэг мэт сайхан өдрийг
+                та бүхэнтэйгээ хамт өнгөрүүлж, инээд хөөр дүүрэн
+                дурсамж бүтээхийг хүсэн чин сэтгэлээсээ урьж байна.
+            </p>
+            <div class="family">
+                <div class="col">
+                    <div class="role">Эцэг эх</div>
+                    <div>Х. Мөнхбаяр</div>
+                    <div>Ц. Дэлгэрмаа</div>
+                </div>
+                <div class="col">
+                    <div class="role">Өвөө эмээ</div>
+                    <div>Д. Дашдорж</div>
+                    <div>Р. Цэвэлмаа</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 · Хүүхдийн тухай -->
+        <section class="slide" id="slide-3" data-hint-dark="true">
+            <div class="section-label">Бидний бяцхан гүнж</div>
+            <h2 class="section-title">Ануужин</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico wide" aria-hidden="true"><use href="#ever"/></svg>
+                <span class="line"></span>
+            </div>
+            <div class="child-card">
+                <div class="photo-ring">
+                    <svg class="ring-khee up" aria-hidden="true"><use href="#sum"/></svg>
+                    <!-- ЗУРАГ СОЛИХ: хүүхдийн хөрөг зураг -->
+                    <img class="child-photo" src="https://picsum.photos/seed/mn-girl-portrait/600/600" alt="Ануужин">
+                    <svg class="ring-khee down" aria-hidden="true"><use href="#sum"/></svg>
+                </div>
+                <h3>Х. Ануужин</h3>
+                <div class="sub">4 настай охин</div>
+                <div class="facts">
+                    <span>🎂 2022.10.24</span>
+                    <span>🦋 Эрвээхэй</span>
+                    <span>🩰 Бүжиг</span>
+                    <span>🐰 Туулай</span>
+                    <span>🍓 Гүзээлзгэнэ</span>
+                </div>
+                <p class="quote">
+                    "Инээмсэглэл нь хаврын цэцэг мэт, зүрх нь наран мэт дулаахан
+                    бидний бяцхан гүнж."
+                </p>
+            </div>
+        </section>
+
+        <!-- 4 · Өссөн зам -->
+        <section class="slide" id="slide-4" data-hint-dark="true">
+            <div class="section-label">Он жилүүд</div>
+            <h2 class="section-title">Өссөн зам</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#tsetseg"/></svg>
+                <span class="line"></span>
+            </div>
+            <!-- ЗУРАГ СОЛИХ: нас бүрийн зургаар солино уу -->
+            <div class="growth">
+                <figure>
+                    <img src="https://picsum.photos/seed/mn-girl-y1/400/400" alt="1 нас">
+                    <figcaption><span class="y">1 нас</span><span class="c">Анхны алхам</span></figcaption>
+                </figure>
+                <figure>
+                    <img src="https://picsum.photos/seed/mn-girl-y2/400/400" alt="2 нас">
+                    <figcaption><span class="y">2 нас</span><span class="c">Даахь үс авсан</span></figcaption>
+                </figure>
+                <figure>
+                    <img src="https://picsum.photos/seed/mn-girl-y3/400/400" alt="3 нас">
+                    <figcaption><span class="y">3 нас</span><span class="c">Цэцэрлэгт орсон</span></figcaption>
+                </figure>
+                <figure>
+                    <img src="https://picsum.photos/seed/mn-girl-y4/400/400" alt="4 нас">
+                    <figcaption><span class="y">4 нас</span><span class="c">Бяцхан гүнж</span></figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- 5 · Зургийн цомог -->
+        <section class="slide" id="slide-5" data-hint-dark="true">
+            <div class="section-label">Дурсамжууд</div>
+            <h2 class="section-title">Инээд хөөрийн мөчүүд</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#ulzii"/></svg>
+                <span class="line"></span>
+            </div>
+            <!-- ЗУРАГ СОЛИХ: доорх 6 зургийг өөрсдийн зургаар солино уу -->
+            <div class="gallery-grid">
+                <img class="tall" src="https://picsum.photos/seed/mn-girl-g1/600/900" alt="Дурсамж 1">
+                <img src="https://picsum.photos/seed/mn-girl-g2/500/500" alt="Дурсамж 2">
+                <img src="https://picsum.photos/seed/mn-girl-g3/500/500" alt="Дурсамж 3">
+                <img src="https://picsum.photos/seed/mn-girl-g4/500/500" alt="Дурсамж 4">
+                <img src="https://picsum.photos/seed/mn-girl-g5/500/500" alt="Дурсамж 5">
+                <img src="https://picsum.photos/seed/mn-girl-g6/500/500" alt="Дурсамж 6">
+            </div>
+        </section>
+
+        <!-- 6 · Огноо ба цаг -->
+        <section class="slide" id="slide-6" data-hint-dark="true">
+            <div class="section-label">Найрын мэдээлэл</div>
+            <h2 class="section-title">Өдөр ба цаг</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#cake"/></svg>
+                <span class="line"></span>
+            </div>
+            <div class="details-grid">
+                <div class="detail-card">
+                    <svg class="khee-strip" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#alkhanSm)"/></svg>
+                    <div class="body">
+                        <div class="icon">📅</div>
+                        <h4>Огноо</h4>
+                        <p class="big">24</p>
+                        <p>2026 оны 10 сарын</p>
+                        <p>Бямба гараг</p>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <svg class="khee-strip" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#alkhanSm)"/></svg>
+                    <div class="body">
+                        <div class="icon">🕐</div>
+                        <h4>Цаг</h4>
+                        <p class="big">13:00</p>
+                        <p>Зочид хүлээн авалт</p>
+                        <p>13:30 — Найр эхэлнэ</p>
+                    </div>
+                </div>
+            </div>
+            <p class="note">Найр 17:00 цаг хүртэл үргэлжилнэ</p>
+        </section>
+
+        <!-- 7 · Байршил -->
+        <section class="slide" id="slide-7" data-hint-dark="true">
+            <div class="section-label">Байршил</div>
+            <h2 class="section-title">Найрын газар</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#ulzii"/></svg>
+                <span class="line"></span>
+            </div>
+            <p class="venue">"ЦЭЦЭГТ ОРДОН" ЭВЕНТ ТАНХИМ</p>
+            <p class="venue-sub">Ягаан танхим, 1 давхар</p>
+            <p class="venue-addr">Улаанбаатар хот, Сүхбаатар дүүрэг, 1-р хороо, Сөүлийн гудамж 7</p>
+            <div class="map-frame">
+                <!-- ЗУРАГ СОЛИХ: газрын зураг эсвэл Google Maps-ийн зураг -->
+                <img src="https://picsum.photos/seed/mn-girl-map/800/320" alt="Газрын зураг">
+            </div>
+            <a class="map-btn" href="https://maps.google.com/?q=Ulaanbaatar" target="_blank" rel="noopener">ГАЗРЫН ЗУРАГ ХАРАХ</a>
+        </section>
+
+        <!-- 8 · Хөтөлбөр -->
+        <section class="slide" id="slide-8" data-hint-dark="true">
+            <div class="section-label">Хөтөлбөр</div>
+            <h2 class="section-title">Найрын дараалал</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico wide" aria-hidden="true"><use href="#ever"/></svg>
+                <span class="line"></span>
+            </div>
+            <ul class="timeline">
+                <li>
+                    <div class="t">13:00</div>
+                    <div class="d">Зочид хүлээн авах</div>
+                    <div class="s">Цэцгэн булан, зураг авалт</div>
+                </li>
+                <li>
+                    <div class="t">13:30</div>
+                    <div class="d">Найр нээх, титэм өргөх</div>
+                    <div class="s">Бяцхан гүнжийн мэндчилгээ</div>
+                </li>
+                <li>
+                    <div class="t">14:00</div>
+                    <div class="d">Бялуу тайрах, лаа үлээх</div>
+                    <div class="s">Төрсөн өдрийн дуу, ерөөл</div>
+                </li>
+                <li>
+                    <div class="t">14:30</div>
+                    <div class="d">Бүжиг, тоглоом</div>
+                    <div class="s">Хөтлөгчтэй хөгжилтэй тэмцээн</div>
+                </li>
+                <li>
+                    <div class="t">15:30</div>
+                    <div class="d">Хоол, амттан</div>
+                    <div class="s">Хүүхдийн цайллага, амттаны ширээ</div>
+                </li>
+                <li>
+                    <div class="t">16:30</div>
+                    <div class="d">Хамтын зураг, үдэлт</div>
+                    <div class="s">Дурсгалын бэлэг гардуулна</div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- 9 · Найрын онцлох -->
+        <section class="slide" id="slide-9" data-hint-dark="true">
+            <div class="section-label">Тэмдэглэл</div>
+            <h2 class="section-title">Найрын онцлох зүйлс</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#erwee"/></svg>
+                <span class="line"></span>
+            </div>
+            <div class="fun-grid">
+                <div class="fun-card">
+                    <div class="ico">👑</div>
+                    <h4>Гүнжийн булан</h4>
+                    <p>Титэм, нүүр будалт, үс засалтын булан.</p>
+                </div>
+                <div class="fun-card">
+                    <div class="ico">🎀</div>
+                    <h4>Тоглоом</h4>
+                    <p>Хөтлөгчтэй бүжиг, бөмбөлөгт өрөө.</p>
+                </div>
+                <div class="fun-card">
+                    <div class="ico">🎁</div>
+                    <h4>Бэлэг</h4>
+                    <p>Та ирсэн нь хамгийн том бэлэг. Хүсвэл ном, тоглоом.</p>
+                </div>
+                <div class="fun-card">
+                    <div class="ico">👗</div>
+                    <h4>Хувцаслалт</h4>
+                    <p>Ягаан, цайвар өнгө эсвэл гүнжийн даашинз.</p>
+                </div>
+            </div>
+            <p class="note">Хүүхдүүдээ дагуулан ирээрэй — тоглоомын булан бэлэн!</p>
+        </section>
+
+        <!-- 10 · Тоолол -->
+        <section class="slide light" id="slide-10" data-hint-dark="false">
+            <div class="section-label">Хүлээлт</div>
+            <h2 class="section-title">Их өдөр хүртэл</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#balloon"/></svg>
+                <span class="line"></span>
+            </div>
+            <div class="countdown-grid">
+                <div class="count-box"><span class="num" id="days">00</span><span class="label">Өдөр</span></div>
+                <div class="count-box"><span class="num" id="hours">00</span><span class="label">Цаг</span></div>
+                <div class="count-box"><span class="num" id="mins">00</span><span class="label">Минут</span></div>
+                <div class="count-box"><span class="num" id="secs">00</span><span class="label">Секунд</span></div>
+            </div>
+        </section>
+
+        <!-- 11 · Ирэх эсэх -->
+        <section class="slide" id="slide-11" data-hint-dark="true">
+            <div class="section-label">Хүсэлт</div>
+            <h2 class="section-title">Оролцох баталгаа</h2>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#ulzii"/></svg>
+                <span class="line"></span>
+            </div>
+            <p class="lead" style="font-size:15px;">
+                Ширээ, бэлэг бэлтгэхэд тус болох тул
+                <strong>10 сарын 15</strong>-ны дотор,
+                хамт ирэх хүүхдийн тоог хамт мэдэгдэнэ үү.
+            </p>
+            <form id="rsvpForm">
+                <input type="text" placeholder="Таны нэр" required>
+                <input type="tel" placeholder="Утасны дугаар" required>
+                <select required>
+                    <option value="">Оролцох эсэх</option>
+                    <option>Тийм, баяртайгаар оролцоно</option>
+                    <option>Харамсалтай нь оролцох боломжгүй</option>
+                </select>
+                <input type="number" placeholder="Хамт ирэх хүний тоо" min="1" max="10">
+                <input type="number" placeholder="Үүнээс хүүхдийн тоо" min="0" max="10">
+                <textarea placeholder="Ерөөл, захидал (сонголтоор)" rows="3"></textarea>
+                <button type="submit">ИЛГЭЭХ</button>
+            </form>
+            <p class="contact">Холбоо барих: <a href="tel:+97688114477">+976 8811 4477</a></p>
+        </section>
+
+        <!-- 12 · Талархал -->
+        <section class="slide light" id="slide-12" data-hint-dark="false">
+            <svg class="crown" aria-hidden="true"><use href="#crown"/></svg>
+            <div class="thanks">Баярлалаа</div>
+            <div class="who">АНУУЖИН БА ГЭР БҮЛИЙНХЭН</div>
+            <div class="ornament">
+                <span class="line"></span>
+                <svg class="khee-ico" aria-hidden="true"><use href="#ulzii"/></svg>
+                <span class="line"></span>
+            </div>
+            <div class="final-date">2026 · 10 · 24 · 13:00</div>
+        </section>
+    </div>
+
+    <div class="hint" id="hint">Дарж дараагийн хуудсыг харна уу ›</div>
+
+    <script>
+        const slides  = document.querySelectorAll('.slide');
+        const total   = slides.length;
+        const bar     = document.getElementById('progressBar');
+        const numEl   = document.getElementById('slideNum');
+        const hint    = document.getElementById('hint');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let current = 0;
+
+        function show(i) {
+            if (i < 0 || i >= total) return;
+            slides[current].classList.remove('active');
+            current = i;
+            slides[current].classList.add('active');
+
+            bar.style.width = ((current + 1) / total * 100) + '%';
+            numEl.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+
+            const dark = slides[current].dataset.hintDark === 'true';
+            hint.classList.toggle('dark', dark);
+            numEl.classList.toggle('dark', dark);
+            hint.style.display = (current === total - 1) ? 'none' : '';
+
+            prevBtn.disabled = current === 0;
+            nextBtn.disabled = current === total - 1;
+
+            slides[current].scrollTop = 0;
+        }
+
+        function next() { if (current < total - 1) show(current + 1); }
+        function prev() { if (current > 0)         show(current - 1); }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button, input, select, textarea, a, form, .nav-btn')) return;
+            next();
+        });
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); next(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        });
+
+        let touchX = 0;
+        document.addEventListener('touchstart', (e) => touchX = e.touches[0].clientX, { passive: true });
+        document.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].clientX - touchX;
+            if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+        });
+
+        document.getElementById('rsvpForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Баярлалаа! Таны хариуг хүлээн авлаа.');
+            next();
+        });
+
+        /* Тоолол — найрын огноо */
+        const eventDate = new Date('2026-10-24T13:00:00').getTime();
+        function updateCountdown() {
+            const dist = eventDate - Date.now();
+            if (dist < 0) return;
+            const d = Math.floor(dist / 86400000);
+            const h = Math.floor((dist % 86400000) / 3600000);
+            const m = Math.floor((dist % 3600000) / 60000);
+            const s = Math.floor((dist % 60000) / 1000);
+            document.getElementById('days').textContent  = String(d).padStart(2, '0');
+            document.getElementById('hours').textContent = String(h).padStart(2, '0');
+            document.getElementById('mins').textContent  = String(m).padStart(2, '0');
+            document.getElementById('secs').textContent  = String(s).padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        /* Нүүр хуудасны цаас цацалт */
+        (function confetti() {
+            const box = document.getElementById('confetti');
+            const colors = ['#e6cf9a', '#f3c6d5', '#b18ad0', '#ffffff', '#cf6f92'];
+            for (let i = 0; i < 26; i++) {
+                const p = document.createElement('i');
+                p.style.left = Math.random() * 100 + '%';
+                p.style.background = colors[i % colors.length];
+                p.style.animationDuration = (7 + Math.random() * 7) + 's';
+                p.style.animationDelay = (-Math.random() * 12) + 's';
+                if (i % 3 === 0) p.style.borderRadius = '50%';
+                box.appendChild(p);
+            }
+        })();
+
+        /* Хөөрөх бөмбөлөг */
+        (function balloons() {
+            const box = document.getElementById('balloons');
+            const colors = ['#f3c6d5', '#b18ad0', '#e6cf9a', '#ffffff', '#e58fac'];
+            for (let i = 0; i < 9; i++) {
+                const b = document.createElement('i');
+                b.style.left = (4 + Math.random() * 90) + '%';
+                b.style.background = colors[i % colors.length];
+                b.style.animationDuration = (16 + Math.random() * 12) + 's';
+                b.style.animationDelay = (-Math.random() * 22) + 's';
+                const sc = 0.75 + Math.random() * 0.6;
+                b.style.width = (34 * sc) + 'px';
+                b.style.height = (43 * sc) + 'px';
+                box.appendChild(b);
+            }
+        })();
+
+        show(0);
+    </script>
+</body>
+</html>

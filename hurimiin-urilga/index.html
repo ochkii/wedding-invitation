@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хуримын урилга</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Noto+Serif+Mongolian:wght@400;500;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #b8935a;
+            --gold-light: #d4b481;
+            --cream: #faf6f0;
+            --dark: #3a2f26;
+            --text: #5a4a3a;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Noto Serif Mongolian', 'Cormorant Garamond', serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.7;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        /* Slide system */
+        .slides {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 24px;
+            background: var(--cream);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        /* Progress bar */
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--gold);
+            width: 0;
+            transition: width 0.5s ease;
+        }
+
+        /* Hint */
+        .hint {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            z-index: 50;
+            opacity: 0.85;
+            pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+        }
+        .hint.dark {
+            color: var(--dark);
+            text-shadow: none;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.85; }
+            50%      { transform: translateX(-50%) translateY(-6px); opacity: 1; }
+        }
+
+        /* Navigation arrow buttons */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid var(--gold-light);
+            color: var(--dark);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 60;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover { background: var(--gold); color: #fff; }
+        .nav-btn.prev { left: 20px; }
+        .nav-btn.next { right: 20px; }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Slide number */
+        .slide-num {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: 3px;
+            z-index: 50;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+        }
+        .slide-num.dark { color: var(--dark); text-shadow: none; }
+
+        /* Shared components */
+        .section-label {
+            font-family: 'Great Vibes', cursive;
+            font-size: 36px;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            letter-spacing: 4px;
+            color: var(--dark);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0 30px;
+            color: var(--gold);
+        }
+        .ornament .line { width: 60px; height: 1px; background: var(--gold); }
+        .ornament .diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
+
+        /* Slide 1 — Cover */
+        #slide-1 {
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%),
+                url('https://picsum.photos/id/1043/1600/1200') center/cover;
+            color: #fff;
+        }
+        #slide-1 .frame {
+            position: absolute;
+            inset: 24px;
+            border: 1px solid rgba(255,255,255,0.4);
+            pointer-events: none;
+        }
+        #slide-1 .invite-label {
+            font-family: 'Great Vibes', cursive;
+            font-size: 34px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            opacity: 0.95;
+        }
+        #slide-1 .names {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(44px, 8vw, 82px);
+            font-weight: 400;
+            letter-spacing: 4px;
+            line-height: 1.15;
+            margin: 20px 0;
+        }
+        #slide-1 .amp {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(54px, 10vw, 94px);
+            font-weight: 300;
+            color: var(--gold-light);
+            display: block;
+            margin: 8px 0;
+        }
+        #slide-1 .date-line {
+            font-size: 16px;
+            letter-spacing: 6px;
+            margin-top: 24px;
+            text-transform: uppercase;
+        }
+
+        /* Slide 2 — Greeting */
+        #slide-2 .greeting-text {
+            max-width: 520px;
+            font-size: 18px;
+            font-style: italic;
+            color: var(--text);
+            margin-bottom: 30px;
+        }
+        .parents {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .parents .col { min-width: 180px; font-size: 16px; color: var(--dark); }
+        .parents .role {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        /* Slide 3 — Couple */
+        .couple {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            max-width: 700px;
+        }
+        .person { text-align: center; }
+        .person img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold-light);
+            padding: 6px;
+            background: #fff;
+        }
+        .person h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            margin-top: 18px;
+            color: var(--dark);
+            letter-spacing: 2px;
+        }
+        .person .desc {
+            font-size: 13px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .person .bio {
+            font-size: 14px;
+            color: var(--text);
+            margin-top: 10px;
+            font-style: italic;
+            max-width: 220px;
+        }
+
+        /* Slide 4 — Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 640px;
+            width: 100%;
+        }
+        .gallery-grid img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            filter: sepia(15%) saturate(0.9);
+        }
+
+        /* Slide 5 — Details */
+        .details-grid {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            max-width: 600px;
+        }
+        .detail-card {
+            padding: 32px 30px;
+            border: 1px solid var(--gold-light);
+            background: #fff;
+            min-width: 200px;
+        }
+        .detail-card .icon { font-size: 32px; color: var(--gold); margin-bottom: 12px; }
+        .detail-card h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: var(--dark);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .detail-card p { font-size: 15px; margin: 4px 0; }
+        .detail-card .big {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 40px;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        /* Slide 6 — Location */
+        #slide-6 .venue {
+            font-size: 22px;
+            color: var(--dark);
+            font-family: 'Cormorant Garamond', serif;
+            letter-spacing: 3px;
+        }
+        #slide-6 .venue-sub { margin-top: 8px; font-size: 15px; }
+        #slide-6 .venue-addr { margin-top: 6px; font-size: 13px; color: var(--gold); }
+        .map-frame {
+            max-width: 520px;
+            width: 100%;
+            margin: 24px auto 0;
+            border: 1px solid var(--gold-light);
+            padding: 6px;
+            background: #fff;
+        }
+        .map-frame img { width: 100%; display: block; }
+
+        /* Slide 7 — Countdown */
+        #slide-7 {
+            background: linear-gradient(rgba(58,47,38,0.85), rgba(58,47,38,0.85)),
+                        url('https://picsum.photos/id/1015/1600/1200') center/cover;
+            color: #fff;
+        }
+        #slide-7 .section-title { color: #fff; }
+        .countdown-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .count-box {
+            width: 100px;
+            padding: 18px 10px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .count-box .num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 44px;
+            font-weight: 500;
+            display: block;
+        }
+        .count-box .label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+
+        /* Slide 8 — RSVP */
+        #slide-8 form {
+            max-width: 420px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        #slide-8 input, #slide-8 select, #slide-8 textarea {
+            width: 100%;
+            padding: 11px 14px;
+            margin-bottom: 12px;
+            border: 1px solid #e0d5c0;
+            background: #fff;
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--text);
+        }
+        #slide-8 button {
+            width: 100%;
+            padding: 14px;
+            background: var(--gold);
+            color: #fff;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        #slide-8 button:hover { background: var(--dark); }
+
+        /* Slide 9 — Thank you */
+        #slide-9 {
+            background: linear-gradient(rgba(58,47,38,0.75), rgba(58,47,38,0.75)),
+                        url('https://picsum.photos/id/1027/1600/1200') center/cover;
+            color: #fff;
+        }
+        #slide-9 .thanks {
+            font-family: 'Great Vibes', cursive;
+            font-size: 72px;
+            color: var(--gold-light);
+        }
+        #slide-9 .names-small {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            letter-spacing: 4px;
+            margin-top: 12px;
+        }
+        #slide-9 .final-date {
+            margin-top: 20px;
+            font-size: 14px;
+            letter-spacing: 4px;
+            opacity: 0.85;
+        }
+
+        @media (max-width: 600px) {
+            .person img { width: 140px; height: 140px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid img { height: 140px; }
+            .nav-btn { width: 36px; height: 36px; font-size: 16px; }
+            .nav-btn.prev { left: 8px; }
+            .nav-btn.next { right: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="slide-num" id="slideNum">01 / 09</div>
+
+    <button class="nav-btn prev" id="prevBtn" aria-label="Өмнөх">‹</button>
+    <button class="nav-btn next" id="nextBtn" aria-label="Дараах">›</button>
+
+    <div class="slides" id="slides">
+
+        <!-- 1 · Cover -->
+        <section class="slide active" id="slide-1" data-hint-dark="false">
+            <span class="frame"></span>
+            <div class="invite-label">Хуримын урилга</div>
+            <div class="names">
+                БАТ-ЭРДЭНЭ
+                <span class="amp">&amp;</span>
+                НОМИНЖИН
+            </div>
+            <div class="date-line">2026 · 09 · 12</div>
+        </section>
+
+        <!-- 2 · Greeting -->
+        <section class="slide" id="slide-2" data-hint-dark="true">
+            <div class="section-label">Хайрт та бүхэндээ</div>
+            <h2 class="section-title">Урьж байна</h2>
+            <div class="ornament"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+            <p class="greeting-text">
+                "Хоёр зүрх нэг болж, хоёр гэр бүл нэг найр болох"
+                тэрхүү мөнхийн өдөр маань ойртон ирлээ.
+                Бидний амьдралын хамгийн онцгой мөчийг
+                хамтдаа хуваалцаасай гэж чин сэтгэлээсээ урьж байна.
+            </p>
+            <div class="parents">
+                <div class="col">
+                    <div class="role">Хүргэний эцэг эх</div>
+                    <div>Ц. Дорж</div>
+                    <div>Б. Оюунчимэг</div>
+                </div>
+                <div class="col">
+                    <div class="role">Бэрийн эцэг эх</div>
+                    <div>Д. Батжаргал</div>
+                    <div>С. Мөнхтуяа</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 · Couple -->
+        <section class="slide" id="slide-3" data-hint-dark="true">
+            <div class="section-label">Хос</div>
+            <h2 class="section-title">Бид хоёр</h2>
+            <div class="ornament"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+            <div class="couple">
+                <div class="person">
+                    <img src="https://picsum.photos/id/1005/400/400" alt="Хүргэн">
+                    <h3>Бат-Эрдэнэ</h3>
+                    <div class="desc">Хүргэн</div>
+                    <p class="bio">"Чамтай учирснаас хойш миний амьдрал бүхэлдээ өөрчлөгдсөн."</p>
+                </div>
+                <div class="person">
+                    <img src="https://picsum.photos/id/1027/400/400" alt="Бэр">
+                    <h3>Номинжин</h3>
+                    <div class="desc">Бэр</div>
+                    <p class="bio">"Чи бол миний хамгийн сайхан мөрөөдөл, бодит амьдрал болсон."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 · Gallery -->
+        <section class="slide" id="slide-4" data-hint-dark="true">
+            <div class="section-label">Дуртай мөчүүд</div>
+            <h2 class="section-title">Бидний түүх</h2>
+            <div class="ornament"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+            <div class="gallery-grid">
+                <img src="https://picsum.photos/id/1062/400/400" alt="1">
+                <img src="https://picsum.photos/id/1074/400/400" alt="2">
+                <img src="https://picsum.photos/id/1080/400/400" alt="3">
+                <img src="https://picsum.photos/id/177/400/400"  alt="4">
+                <img src="https://picsum.photos/id/823/400/400"  alt="5">
+                <img src="https://picsum.photos/id/342/400/400"  alt="6">
+            </div>
+        </section>
+
+        <!-- 5 · Details -->
+        <section class="slide" id="slide-5" data-hint-dark="true">
+            <div class="section-label">Ёслолын мэдээлэл</div>
+            <h2 class="section-title">Өдөр ба цаг</h2>
+            <div class="ornament"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="icon">📅</div>
+                    <h4>Огноо</h4>
+                    <p class="big">12</p>
+                    <p>2026 оны 9 сарын</p>
+                    <p>Бямба гараг</p>
+                </div>
+                <div class="detail-card">
+                    <div class="icon">🕕</div>
+                    <h4>Цаг</h4>
+                    <p class="big">18:00</p>
+                    <p>Хүлээн авалт</p>
+                    <p>19:00 — Ёслол</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6 · Location -->
+        <section class="slide" id="slide-6" data-hint-dark="true">
+            <div class="section-label">Байршил</div>
+            <h2 class="section-title">Найрын газар</h2>
+            <div class="ornament"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+            <p class="venue">ШАНГРИ-ЛА ЗОЧИД БУУДАЛ</p>
+            <p class="venue-sub">Их танхим, 2 давхар</p>
+            <p class="venue-addr">Улаанбаатар хот, Сүхбаатар дүүрэг, Оюутны гудамж</p>
+            <div class="map-frame">
+                <img src="https://picsum.photos/id/1015/800/300" alt="Газрын зураг">
+            </div>
+        </section>
+
+        <!-- 7 · Countdown -->
+        <section class="slide" id="slide-7" data-hint-dark="false">
+            <div class="section-label">Ялангуяа</div>
+            <h2 class="section-title">Их өдөр хүртэл</h2>
+            <div class="ornament"><span class="line" style="background:#fff;"></span><span class="diamond" style="background:#fff;"></span><span class="line" style="background:#fff;"></span></div>
+            <div class="countdown-grid">
+                <div class="count-box"><span class="num" id="days">00</span><span class="label">Өдөр</span></div>
+                <div class="count-box"><span class="num" id="hours">00</span><span class="label">Цаг</span></div>
+                <div class="count-box"><span class="num" id="mins">00</span><span class="label">Минут</span></div>
+                <div class="count-box"><span class="num" id="secs">00</span><span class="label">Секунд</span></div>
+            </div>
+        </section>
+
+        <!-- 8 · RSVP -->
+        <section class="slide" id="slide-8" data-hint-dark="true">
+            <div class="section-label">Хүсэлт</div>
+            <h2 class="section-title">Оролцох баталгаа</h2>
+            <div class="ornament"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
+            <p style="max-width:420px;">Найранд оролцох боломжтой эсэхээ 8 сарын 25-ны өдрөөс өмнө мэдэгдэнэ үү.</p>
+            <form id="rsvpForm">
+                <input type="text" placeholder="Таны нэр" required>
+                <input type="tel"  placeholder="Утасны дугаар" required>
+                <select required>
+                    <option value="">Оролцох эсэх</option>
+                    <option>Тийм, баяртайгаар оролцоно</option>
+                    <option>Харамсалтай нь оролцох боломжгүй</option>
+                </select>
+                <input type="number" placeholder="Хамт очих хүний тоо" min="1" max="5">
+                <textarea placeholder="Захидал (сонголтоор)" rows="3"></textarea>
+                <button type="submit">Илгээх</button>
+            </form>
+        </section>
+
+        <!-- 9 · Thank you -->
+        <section class="slide" id="slide-9" data-hint-dark="false">
+            <div class="thanks">Баярлалаа</div>
+            <div class="names-small">Бат-Эрдэнэ &amp; Номинжин</div>
+            <div class="ornament"><span class="line" style="background:#fff;"></span><span class="diamond" style="background:#fff;"></span><span class="line" style="background:#fff;"></span></div>
+            <div class="final-date">2026 · 09 · 12</div>
+        </section>
+    </div>
+
+    <div class="hint" id="hint">Дэлгэц дээр дарж дараагийн хуудсыг харна уу</div>
+
+    <script>
+        const slides   = document.querySelectorAll('.slide');
+        const total    = slides.length;
+        const bar      = document.getElementById('progressBar');
+        const numEl    = document.getElementById('slideNum');
+        const hint     = document.getElementById('hint');
+        const prevBtn  = document.getElementById('prevBtn');
+        const nextBtn  = document.getElementById('nextBtn');
+        let current = 0;
+
+        function show(i) {
+            if (i < 0 || i >= total) return;
+            slides[current].classList.remove('active');
+            current = i;
+            slides[current].classList.add('active');
+
+            bar.style.width = ((current + 1) / total * 100) + '%';
+            numEl.textContent = String(current + 1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+
+            const dark = slides[current].dataset.hintDark === 'true';
+            hint.classList.toggle('dark', dark);
+            numEl.classList.toggle('dark', dark);
+
+            hint.style.display = (current === total - 1) ? 'none' : '';
+
+            prevBtn.disabled = current === 0;
+            nextBtn.disabled = current === total - 1;
+
+            slides[current].scrollTop = 0;
+        }
+
+        function next() { if (current < total - 1) show(current + 1); }
+        function prev() { if (current > 0)         show(current - 1); }
+
+        // Click anywhere to advance (except on interactive elements)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button, input, select, textarea, a, form, .nav-btn')) return;
+            next();
+        });
+
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); next(); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+        });
+
+        // Swipe (touch)
+        let touchX = 0;
+        document.addEventListener('touchstart', (e) => touchX = e.touches[0].clientX);
+        document.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].clientX - touchX;
+            if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+        });
+
+        // RSVP handler
+        document.getElementById('rsvpForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Баярлалаа! Таны хүсэлтийг хүлээн авлаа.');
+            next();
+        });
+
+        // Countdown
+        const weddingDate = new Date('2026-09-12T18:00:00').getTime();
+        function updateCountdown() {
+            const dist = weddingDate - Date.now();
+            if (dist < 0) return;
+            const d = Math.floor(dist / 86400000);
+            const h = Math.floor((dist % 86400000) / 3600000);
+            const m = Math.floor((dist % 3600000)  / 60000);
+            const s = Math.floor((dist % 60000)    / 1000);
+            document.getElementById('days').textContent  = String(d).padStart(2,'0');
+            document.getElementById('hours').textContent = String(h).padStart(2,'0');
+            document.getElementById('mins').textContent  = String(m).padStart(2,'0');
+            document.getElementById('secs').textContent  = String(s).padStart(2,'0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Initial state
+        show(0);
+    </script>
+</body>
+</html>
